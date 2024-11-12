@@ -1,0 +1,29 @@
+name: PostgreSQL Liveness Check
+
+on: [push]
+
+jobs:
+  postgres-liveness-job:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: PostgreSQL Liveness Check
+        uses: docker://koppor/postgres-liveness-check:latest
+        env:
+          DB_HOST: "localhost"
+          DB_PORT: "5432"
+          DB_USER: "postgres"
+          DB_PASSWORD: "postgres"
